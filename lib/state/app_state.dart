@@ -9,6 +9,7 @@ class AppState with ChangeNotifier {
     'NovelMania',
     'Tsundoku',
     'CentralNovels',
+    'illusia',
   };
 
   ThemeMode get themeMode => _themeMode;
@@ -42,7 +43,7 @@ class AppState with ChangeNotifier {
       Set<String> savedPlugins =
           (plugins?.isNotEmpty == true ? Set<String>.from(plugins!) : {});
 
-      _selectedPlugins = {'CentralNovel'}.union(savedPlugins);
+      _selectedPlugins = {'illusia'}.union(savedPlugins);
 
       _themeMode =
           ThemeMode.values[prefs.getInt('themeMode') ?? ThemeMode.system.index];

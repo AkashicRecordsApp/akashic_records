@@ -9,6 +9,7 @@ import 'package:akashic_records/services/plugins/ptbr/tsundoku_service.dart';
 import 'package:provider/provider.dart';
 import 'package:akashic_records/state/app_state.dart';
 import 'package:akashic_records/screens/library/novel_filter_sort_widget.dart';
+import 'package:akashic_records/services/plugins/ptbr/illusia_service.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -22,6 +23,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
   final NovelMania novelMania = NovelMania();
   final Tsundoku tsundoku = Tsundoku();
   final CentralNovel centralnovel = CentralNovel();
+  final IllusiaService illusiaService = IllusiaService();
   bool isLoading = false;
   bool hasMore = true;
   int currentPage = 1;
@@ -54,6 +56,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
   Future<void> _initializeFilters() async {
     Map<String, dynamic> initialFilters = {};
     final appState = Provider.of<AppState>(context, listen: false);
+
     if (appState.selectedPlugins.contains('NovelMania')) {
       initialFilters.addAll(novelMania.filters);
     }
@@ -63,10 +66,33 @@ class _LibraryScreenState extends State<LibraryScreen> {
     if (appState.selectedPlugins.contains('CentralNovel')) {
       initialFilters.addAll(centralnovel.filters);
     }
+
+    if (appState.selectedPlugins.contains('illusia')) {
+      await _waitForillusiaFilters();
+      if (illusiaService.filters.isNotEmpty) {
+        initialFilters.addAll(illusiaService.filters);
+      } else {
+        print("illusia filters not initialized.");
+      }
+    }
+
     if (mounted) {
       setState(() {
         _filters = initialFilters;
       });
+    }
+  }
+
+  Future<void> _waitForillusiaFilters() async {
+    int attempts = 0;
+    while (illusiaService.filters.isEmpty && attempts < 100) {
+      await Future.delayed(const Duration(milliseconds: 50));
+      attempts++;
+    }
+    if (attempts >= 100 && illusiaService.filters.isEmpty) {
+      print(
+        "illusiaService filters failed to initialize within a reasonable timeframe.",
+      );
     }
   }
 
@@ -103,7 +129,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
           currentPage,
           filters: _filters,
         );
-        print('novelManiaNovels: $novelManiaNovels');
         newNovels.addAll(novelManiaNovels);
       }
       if (appState.selectedPlugins.contains('Tsundoku')) {
@@ -120,6 +145,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
         );
         newNovels.addAll(centralNovelNovels);
       }
+      if (appState.selectedPlugins.contains('illusia')) {
+        final illusiaNovels = await illusiaService.popularNovels(
+          currentPage,
+          filters: _filters,
+        );
+        newNovels.addAll(illusiaNovels);
+      }
 
       for (final novel in newNovels) {
         if (!allNovels.any((existingNovel) => existingNovel.id == novel.id)) {
@@ -130,7 +162,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
       if (mounted) {
         setState(() {
           if (search) {
-            novels = allNovels
+            novels =
+                allNovels
                     .where(
                       (novel) => novel.title.toLowerCase().contains(
                         _searchTerm.toLowerCase(),
@@ -188,6 +221,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
     } else if (novel.id.startsWith('/series/') &&
         appState.selectedPlugins.contains('CentralNovel')) {
       return 'CentralNovel';
+    } else if (novel.id.startsWith('/story/') &&
+        appState.selectedPlugins.contains('illusia')) {
+      return 'illusia';
     }
     return '';
   }
@@ -209,11 +245,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NovelDetailsScreen(
-          novelId: novel.id,
-          pluginId: pluginId,
-          selectedPlugins: Provider.of<AppState>(context, listen: false).selectedPlugins,
-        ),
+        builder:
+            (context) => NovelDetailsScreen(
+              novelId: novel.id,
+              pluginId: pluginId,
+              selectedPlugins:
+                  Provider.of<AppState>(context, listen: false).selectedPlugins,
+            ),
       ),
     );
   }

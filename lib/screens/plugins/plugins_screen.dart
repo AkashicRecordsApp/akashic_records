@@ -16,6 +16,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
     'CentralNovel',
     'LightNovelPub',
     'MtlNovelPt',
+    'illusia',
   ];
 
   @override
@@ -70,7 +71,6 @@ class _PluginsScreenState extends State<PluginsScreen> {
                                 );
                               }
                             },
-
                             activeColor: Theme.of(context).colorScheme.primary,
                           ),
                           Expanded(
