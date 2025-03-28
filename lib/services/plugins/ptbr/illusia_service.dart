@@ -1,18 +1,15 @@
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
-import 'package:akashic_records/models/novel.dart';
-import 'package:akashic_records/models/chapter.dart';
-import 'package:akashic_records/models/novel_status.dart';
+import 'package:akashic_records/models/model.dart';
 
-class IllusiaService {
-  final String id = 'illusia';
-  final String name = 'illusia';
-  final String baseUrl = 'https://illusia.com.br';
-  final String browsePage = '/historias';
-  final String searchPage = '/';
-  final String version = '1.0.3';
+import 'package:akashic_records/models/plugin_service.dart';
 
-  Map<String, dynamic> filters = {
+class Illusia implements PluginService {
+  @override
+  String get name => 'Illusia';
+
+  @override
+  Map<String, dynamic> get filters => {
     'order': {
       'label': 'Ordenar por',
       'value': 'default',
@@ -25,6 +22,13 @@ class IllusiaService {
       ],
     },
   };
+
+  final String id = 'illusia';
+  final String nameService = 'illusia';
+  final String baseUrl = 'https://illusia.com.br';
+  final String browsePage = '/historias';
+  final String searchPage = '/';
+  final String version = '1.0.3';
 
   Future<String> _fetchApi(String url) async {
     try {
@@ -50,9 +54,10 @@ class IllusiaService {
     return '$baseUrl$path';
   }
 
+  @override
   Future<List<Novel>> popularNovels(
     int page, {
-    required Map<String, dynamic> filters,
+    Map<String, dynamic>? filters,
   }) async {
     final url = _expandUrl('$browsePage/${page == 1 ? '' : 'page/$page'}');
     try {
@@ -88,6 +93,7 @@ class IllusiaService {
           chapters: [],
           artist: '',
           statusString: '',
+          pluginId: name,
         );
       }).toList();
     } catch (e) {
@@ -96,6 +102,7 @@ class IllusiaService {
     }
   }
 
+  @override
   Future<Novel> parseNovel(String novelPath) async {
     if (!novelPath.startsWith('/story/')) {
       print('Invalid novel path: $novelPath. Must start with /story/');
@@ -109,6 +116,7 @@ class IllusiaService {
         chapters: [],
         artist: '',
         statusString: '',
+        pluginId: name,
       );
     }
     final url = _expandUrl(novelPath);
@@ -137,6 +145,7 @@ class IllusiaService {
         chapters: [],
         artist: '',
         statusString: '',
+        pluginId: name,
       );
 
       final statusText =
@@ -147,11 +156,11 @@ class IllusiaService {
           '';
 
       if (statusText.contains('Em andamento')) {
-        novel.status = NovelStatus.ongoing;
+        novel.status = NovelStatus.Ongoing;
       } else if (statusText.contains('Completo')) {
-        novel.status = NovelStatus.completed;
+        novel.status = NovelStatus.Completed;
       } else if (statusText.contains('Hiatus')) {
-        novel.status = NovelStatus.onHiatus;
+        novel.status = NovelStatus.OnHiatus;
       }
 
       final chapterElements = document.querySelectorAll(
@@ -178,6 +187,7 @@ class IllusiaService {
     }
   }
 
+  @override
   Future<String> parseChapter(String chapterPath) async {
     if (!chapterPath.startsWith('/story/')) {
       print('Invalid chapter path: $chapterPath. Must start with /story/');
@@ -197,7 +207,12 @@ class IllusiaService {
     }
   }
 
-  Future<List<Novel>> searchNovels(String searchTerm, int page) async {
+  @override
+  Future<List<Novel>> searchNovels(
+    String searchTerm,
+    int page, {
+    Map<String, dynamic>? filters,
+  }) async {
     final encodedSearchTerm = Uri.encodeComponent(searchTerm);
     final url = _expandUrl(
       '$searchPage?s=$encodedSearchTerm&post_type=wp-manga&page=$page',
@@ -234,6 +249,7 @@ class IllusiaService {
           chapters: [],
           artist: '',
           statusString: '',
+          pluginId: name,
         );
       }).toList();
     } catch (e) {

@@ -1,3 +1,4 @@
+import 'package:akashic_records/services/plugins/ptbr/illusia_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:akashic_records/models/plugin_service.dart';
@@ -9,7 +10,7 @@ class AppState with ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
   Color _accentColor = Colors.blue;
   bool _settingsLoaded = false;
-  Set<String> _selectedPlugins = {'NovelMania', 'Tsundoku', 'CentralNovel'};
+  Set<String> _selectedPlugins = {'NovelMania', 'Tsundoku', 'CentralNovel','Illusia'};
 
   final Map<String, PluginService> _pluginServices = {};
 
@@ -17,6 +18,7 @@ class AppState with ChangeNotifier {
     _pluginServices['NovelMania'] = NovelMania();
     _pluginServices['Tsundoku'] = Tsundoku();
     _pluginServices['CentralNovel'] = CentralNovel();
+    _pluginServices['Illusia'] = Illusia();
   }
 
   ThemeMode get themeMode => _themeMode;
