@@ -1,15 +1,11 @@
-import 'package:akashic_records/models/novel.dart';
+import 'package:akashic_records/models/model.dart';
 import 'package:akashic_records/screens/details/novel_details_screen.dart';
 import 'package:akashic_records/screens/library/search_bar_widget.dart';
 import 'package:akashic_records/screens/library/novel_grid_widget.dart';
-import 'package:akashic_records/services/plugins/ptbr/centralnovel_service.dart';
 import 'package:flutter/material.dart';
-import 'package:akashic_records/services/plugins/ptbr/novelmania_service.dart';
-import 'package:akashic_records/services/plugins/ptbr/tsundoku_service.dart';
 import 'package:provider/provider.dart';
 import 'package:akashic_records/state/app_state.dart';
 import 'package:akashic_records/screens/library/novel_filter_sort_widget.dart';
-import 'package:akashic_records/services/plugins/ptbr/illusia_service.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -20,10 +16,6 @@ class LibraryScreen extends StatefulWidget {
 
 class _LibraryScreenState extends State<LibraryScreen> {
   List<Novel> novels = [];
-  final NovelMania novelMania = NovelMania();
-  final Tsundoku tsundoku = Tsundoku();
-  final CentralNovel centralnovel = CentralNovel();
-  final IllusiaService illusiaService = IllusiaService();
   bool isLoading = false;
   bool hasMore = true;
   int currentPage = 1;
@@ -57,22 +49,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
     Map<String, dynamic> initialFilters = {};
     final appState = Provider.of<AppState>(context, listen: false);
 
-    if (appState.selectedPlugins.contains('NovelMania')) {
-      initialFilters.addAll(novelMania.filters);
-    }
-    if (appState.selectedPlugins.contains('Tsundoku')) {
-      initialFilters.addAll(tsundoku.filters);
-    }
-    if (appState.selectedPlugins.contains('CentralNovel')) {
-      initialFilters.addAll(centralnovel.filters);
-    }
-
-    if (appState.selectedPlugins.contains('illusia')) {
-      await _waitForillusiaFilters();
-      if (illusiaService.filters.isNotEmpty) {
-        initialFilters.addAll(illusiaService.filters);
-      } else {
-        print("illusia filters not initialized.");
+    for (final pluginName in appState.selectedPlugins) {
+      final plugin = appState.pluginServices[pluginName];
+      if (plugin != null) {
+        initialFilters.addAll(plugin.filters);
       }
     }
 
@@ -80,19 +60,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
       setState(() {
         _filters = initialFilters;
       });
-    }
-  }
-
-  Future<void> _waitForillusiaFilters() async {
-    int attempts = 0;
-    while (illusiaService.filters.isEmpty && attempts < 100) {
-      await Future.delayed(const Duration(milliseconds: 50));
-      attempts++;
-    }
-    if (attempts >= 100 && illusiaService.filters.isEmpty) {
-      print(
-        "illusiaService filters failed to initialize within a reasonable timeframe.",
-      );
     }
   }
 
@@ -124,33 +91,15 @@ class _LibraryScreenState extends State<LibraryScreen> {
       List<Novel> newNovels = [];
       final appState = Provider.of<AppState>(context, listen: false);
 
-      if (appState.selectedPlugins.contains('NovelMania')) {
-        final novelManiaNovels = await novelMania.popularNovels(
-          currentPage,
-          filters: _filters,
-        );
-        newNovels.addAll(novelManiaNovels);
-      }
-      if (appState.selectedPlugins.contains('Tsundoku')) {
-        final tsundokuNovels = await tsundoku.popularNovels(
-          currentPage,
-          filters: _filters,
-        );
-        newNovels.addAll(tsundokuNovels);
-      }
-      if (appState.selectedPlugins.contains('CentralNovel')) {
-        final centralNovelNovels = await centralnovel.popularNovels(
-          currentPage,
-          filters: _filters,
-        );
-        newNovels.addAll(centralNovelNovels);
-      }
-      if (appState.selectedPlugins.contains('illusia')) {
-        final illusiaNovels = await illusiaService.popularNovels(
-          currentPage,
-          filters: _filters,
-        );
-        newNovels.addAll(illusiaNovels);
+      for (final pluginName in appState.selectedPlugins) {
+        final plugin = appState.pluginServices[pluginName];
+        if (plugin != null) {
+          final pluginNovels = await plugin.popularNovels(
+            currentPage,
+            filters: _filters,
+          );
+          newNovels.addAll(pluginNovels);
+        }
       }
 
       for (final novel in newNovels) {
@@ -209,25 +158,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
     await _loadNovels(search: _searchTerm.isNotEmpty);
   }
 
-  String getPluginIdForNovel(Novel novel) {
-    final appState = Provider.of<AppState>(context, listen: false);
-
-    if (novel.id.startsWith('/novels/') &&
-        appState.selectedPlugins.contains('NovelMania')) {
-      return 'NovelMania';
-    } else if (novel.id.startsWith('/manga/') &&
-        appState.selectedPlugins.contains('Tsundoku')) {
-      return 'Tsundoku';
-    } else if (novel.id.startsWith('/series/') &&
-        appState.selectedPlugins.contains('CentralNovel')) {
-      return 'CentralNovel';
-    } else if (novel.id.startsWith('/story/') &&
-        appState.selectedPlugins.contains('illusia')) {
-      return 'illusia';
-    }
-    return '';
-  }
-
   Future<void> _onFilterChanged(Map<String, dynamic> newFilters) async {
     if (mounted) {
       setState(() {
@@ -241,14 +171,14 @@ class _LibraryScreenState extends State<LibraryScreen> {
     await _loadNovels();
   }
 
-  void _handleNovelTap(Novel novel, String pluginId) {
+  void _handleNovelTap(Novel novel) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder:
             (context) => NovelDetailsScreen(
               novelId: novel.id,
-              pluginId: pluginId,
+              pluginId: novel.pluginId,
               selectedPlugins:
                   Provider.of<AppState>(context, listen: false).selectedPlugins,
             ),
@@ -294,7 +224,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 errorMessage: errorMessage,
                 scrollController: _scrollController,
                 onNovelTap: _handleNovelTap,
-                getPluginIdForNovel: getPluginIdForNovel,
               ),
             ),
           ),

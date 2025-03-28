@@ -1,21 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:akashic_records/models/plugin_service.dart';
+import 'package:akashic_records/services/plugins/ptbr/novelmania_service.dart';
+import 'package:akashic_records/services/plugins/ptbr/tsundoku_service.dart';
+import 'package:akashic_records/services/plugins/ptbr/centralnovel_service.dart';
 
 class AppState with ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
   Color _accentColor = Colors.blue;
   bool _settingsLoaded = false;
-  Set<String> _selectedPlugins = {
-    'NovelMania',
-    'Tsundoku',
-    'CentralNovels',
-    'illusia',
-  };
+  Set<String> _selectedPlugins = {'NovelMania', 'Tsundoku', 'CentralNovel'};
+
+  final Map<String, PluginService> _pluginServices = {};
+
+  AppState() {
+    _pluginServices['NovelMania'] = NovelMania();
+    _pluginServices['Tsundoku'] = Tsundoku();
+    _pluginServices['CentralNovel'] = CentralNovel();
+  }
 
   ThemeMode get themeMode => _themeMode;
   Color get accentColor => _accentColor;
   bool get settingsLoaded => _settingsLoaded;
   Set<String> get selectedPlugins => _selectedPlugins;
+
+  Map<String, PluginService> get pluginServices => _pluginServices;
 
   void setThemeMode(ThemeMode newThemeMode) {
     _themeMode = newThemeMode;
@@ -43,7 +52,7 @@ class AppState with ChangeNotifier {
       Set<String> savedPlugins =
           (plugins?.isNotEmpty == true ? Set<String>.from(plugins!) : {});
 
-      _selectedPlugins = {'illusia'}.union(savedPlugins);
+      _selectedPlugins = {'CentralNovel'}.union(savedPlugins);
 
       _themeMode =
           ThemeMode.values[prefs.getInt('themeMode') ?? ThemeMode.system.index];
