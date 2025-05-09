@@ -11,7 +11,9 @@ class RoyalRoad implements PluginService {
   @override
   String get lang => 'en';
   @override
-  String get version => '1.2.7';
+  String get version => '1.2.8';
+  @override
+  bool get cloudflare => false;
 
   String get id => 'royalroad';
 

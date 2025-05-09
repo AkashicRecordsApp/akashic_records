@@ -20,6 +20,8 @@ class NovelMania implements PluginService {
   @override
   String get lang => 'pt-BR';
   @override
+  bool get cloudflare => false;
+  @override
   Map<String, dynamic> get filters => {
     'genres': {
       'value': '',

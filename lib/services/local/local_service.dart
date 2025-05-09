@@ -19,7 +19,8 @@ import 'package:archive/archive_io.dart';
 class Dispositivo implements PluginService {
   @override
   String get name => 'Dispositivo';
-
+  @override
+  bool get cloudflare => false;
   @override
   String get lang => 'Local'.translate;
 
@@ -29,7 +30,7 @@ class Dispositivo implements PluginService {
   final String id = 'Dispositivo';
   final String nameService = 'Dispositivo';
   @override
-  final String version = '1.2.3';
+  final String version = '1.2.4';
 
   static const String defaultCover =
       'https://placehold.co/400x500.png?text=Cover%20Scrap%20Failed';

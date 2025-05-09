@@ -10,7 +10,8 @@ class Kakuyomu implements PluginService {
 
   @override
   String get lang => 'ja';
-
+  @override
+  bool get cloudflare => false;
   @override
   Map<String, dynamic> get filters => {
     'genre': {

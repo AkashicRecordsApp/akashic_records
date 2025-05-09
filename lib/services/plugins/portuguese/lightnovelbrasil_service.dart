@@ -109,6 +109,8 @@ class LightNovelBrasil implements PluginService {
   final String baseURL = 'https://lightnovelbrasil.com/';
   @override
   final String version = '1.2.7';
+  @override
+  bool get cloudflare => false;
   final bool reverseChapters = true;
   final String seriesPath = "/series/";
 

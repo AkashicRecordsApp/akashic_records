@@ -12,6 +12,8 @@ class Webnovel implements PluginService {
   @override
   String get lang => 'en';
   @override
+  bool get cloudflare => false;
+  @override
   Map<String, dynamic> get filters => {
     'sort': {
       'label': 'Sort Results By',
@@ -102,7 +104,7 @@ class Webnovel implements PluginService {
   final String site = 'https://www.webnovel.com';
   final String icon = 'src/en/webnovel/icon.png';
   @override
-  final String version = '1.0.3';
+  final String version = '1.0.4';
 
   final Map<String, String> _headers = {
     'User-Agent':

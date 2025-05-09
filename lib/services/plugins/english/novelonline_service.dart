@@ -11,6 +11,8 @@ class NovelsOnline implements PluginService {
   @override
   String get lang => 'en';
   @override
+  bool get cloudflare => false;
+  @override
   Map<String, dynamic> get filters => {
     'sort': {
       'value': 'top_rated',
@@ -71,7 +73,7 @@ class NovelsOnline implements PluginService {
   final String site = 'https://novelsonline.org';
   final String icon = 'src/en/novelsonline/icon.png';
   @override
-  final String version = '1.0.0';
+  final String version = '1.0.5';
 
   Future<http.Response> safeFetch(
     String url, {

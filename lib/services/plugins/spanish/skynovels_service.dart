@@ -11,6 +11,8 @@ class SkyNovels implements PluginService {
   @override
   String get name => 'SkyNovels';
   @override
+  bool get cloudflare => false;
+  @override
   String get lang => 'es';
   String get id => 'SkyNovels';
   @override

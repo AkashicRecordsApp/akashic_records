@@ -9,6 +9,8 @@ class Tsundoku implements PluginService {
   @override
   String get name => 'Tsundoku';
   @override
+  bool get cloudflare => false;
+  @override
   String get lang => 'pt-BR';
   @override
   Map<String, dynamic> get filters => {

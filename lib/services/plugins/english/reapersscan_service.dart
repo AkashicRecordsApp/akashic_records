@@ -17,7 +17,9 @@ class ReaperScans implements PluginService {
   final String id = 'ReaperScans';
   final String nameService = 'ReaperScans';
   @override
-  final String version = '1.0.0';
+  final String version = '1.0.1';
+  @override
+  bool get cloudflare => false;
   final String icon = 'src/en/reaperscans/icon.png';
   final String site = 'https://reaperscans.com';
   final String apiBase = 'https://api.reaperscans.com';

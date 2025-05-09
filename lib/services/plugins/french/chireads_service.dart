@@ -8,7 +8,8 @@ import 'package:intl/intl.dart';
 
 class Chireads implements PluginService {
   String get id => 'chireads';
-
+  @override
+  bool get cloudflare => false;
   @override
   String get name => 'Chireads';
 
@@ -16,7 +17,7 @@ class Chireads implements PluginService {
   String get lang => 'fr';
 
   @override
-  String get version => '1.0.1';
+  String get version => '1.0.2';
 
   final String site = 'https://chireads.com';
 

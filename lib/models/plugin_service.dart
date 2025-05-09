@@ -5,6 +5,7 @@ abstract class PluginService {
   String get name;
   String get version;
   String get lang;
+  bool get cloudflare;
   Map<String, dynamic> get filters;
   Future<List<Novel>> popularNovels(
     int page, {

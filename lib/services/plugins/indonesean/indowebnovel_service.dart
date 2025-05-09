@@ -10,12 +10,13 @@ class IndoWebNovel implements PluginService {
 
   @override
   String get name => 'IndoWebNovel';
-
+  @override
+  bool get cloudflare => false;
   @override
   String get lang => 'id';
 
   @override
-  String get version => '1.0.1';
+  String get version => '1.0.2';
 
   final String site = 'https://indowebnovel.id/';
 

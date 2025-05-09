@@ -6,12 +6,13 @@ import 'package:http/http.dart' as http;
 
 class Sunovels implements PluginService {
   String get id => 'sunovels';
-
+@override
+  bool get cloudflare => false;
   @override
   String get name => 'Sunovels';
 
   @override
-  String get version => '1.0.0';
+  String get version => '1.0.1';
 
   @override
   String get lang => 'ar';

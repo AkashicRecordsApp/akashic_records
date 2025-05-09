@@ -7,13 +7,14 @@ import 'package:http/http.dart' as http;
 
 class NovelBin implements PluginService {
   String get id => 'NovelBin';
-
+  @override
+  bool get cloudflare => false;
   @override
   String get name => 'NovelBin';
   @override
   String get lang => 'en';
   @override
-  String get version => '1.0.7';
+  String get version => '1.0.8';
 
   final String baseURL = 'https://novelbin.me/';
   final String catalogURL = 'https://novelbin.me/sort/novelbin-popular';

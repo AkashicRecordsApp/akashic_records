@@ -7,7 +7,8 @@ import 'package:flutter/src/widgets/framework.dart';
 class ProjectGutenberg implements PluginService {
   @override
   String get name => 'ProjectGutenberg';
-
+  @override
+  bool get cloudflare => false;
   @override
   String get lang => 'en';
 
@@ -18,7 +19,7 @@ class ProjectGutenberg implements PluginService {
   final String nameService = 'Project Gutenberg';
   final String baseURL = 'https://gnikdroy.pythonanywhere.com/api';
   @override
-  final String version = '1.0.4';
+  final String version = '1.0.5';
 
   String? _extractCoverUrl(List<dynamic>? resources) {
     if (resources == null || resources.isEmpty) {

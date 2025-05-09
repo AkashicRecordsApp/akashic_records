@@ -8,7 +8,8 @@ import 'package:html/dom.dart' as dom;
 class Syosetu implements PluginService {
   @override
   String get name => 'Syosetu';
-
+  @override
+  bool get cloudflare => false;
   @override
   String get lang => 'ja';
 
