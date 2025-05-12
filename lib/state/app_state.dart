@@ -4,6 +4,7 @@ import 'package:akashic_records/models/plugin_service.dart';
 import 'package:akashic_records/screens/settings/appearance_settings.dart';
 import 'package:akashic_records/services/local/local_service.dart';
 import 'package:akashic_records/services/plugins/arabic/sunovels_service.dart';
+import 'package:akashic_records/services/plugins/english/lightnovelpub_service.dart';
 import 'package:akashic_records/services/plugins/english/projectgutenberg_service.dart';
 import 'package:akashic_records/services/plugins/french/chireads_service.dart';
 import 'package:akashic_records/services/plugins/indonesean/indowebnovel_service.dart';
@@ -397,6 +398,11 @@ class AppState with ChangeNotifier {
     _pluginServices['ReaperScans'] = ReaperScans();
     _pluginInfo['ReaperScans'] = PluginInfo(
       name: 'ReaperScans',
+      language: PluginLanguage.en,
+    );
+    _pluginServices['LightNovelPub'] = LightNovelPub();
+    _pluginInfo['LightNovelPub'] = PluginInfo(
+      name: 'LightNovelPub',
       language: PluginLanguage.en,
     );
 
@@ -1033,6 +1039,34 @@ class AppState with ChangeNotifier {
       debugPrint("Saved local novel ${novel.title} to Hive with key: $key");
     } catch (e) {
       debugPrint("Error saving local novel ${novel.title} to Hive: $e");
+    }
+  }
+
+  bool hasCloudflare(String pluginName) {
+    return _pluginServices.containsKey(pluginName) &&
+        _pluginServices[pluginName]!.cloudflare;
+  }
+
+  Future<void> captureCloudflare(
+    BuildContext context,
+    String pluginName,
+    String url,
+  ) async {
+    final service = _pluginServices[pluginName];
+    if (service is CloudflareBypass) {
+      await (service as CloudflareBypass).captureCloudflareCookies(
+        context,
+        url,
+      );
+    } else {
+      debugPrint("Plugin $pluginName does not implement CloudflareBypass.");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Plugin $pluginName does not support Cloudflare bypass.',
+          ),
+        ),
+      );
     }
   }
 }
